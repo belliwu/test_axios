@@ -5,13 +5,14 @@ class GlobalAxios {
     this.init()
   }
 
+  //-----------------------------------------------------------------------------------
   //Initilize during new instance
   init() {
     const instance = axios.create({
-      baseURL: 'http://127.0.0.1:8081',
-      'content-type': 'application/json',
+      baseURL: "http://127.0.0.1:8081",
+      "Content-Type": "application/json",
       Authorization: "",
-      timeout: 10000
+      timeout: 30000
     });
 
     instance.interceptors.request.use(this.handleRequestConfig, this.handleConfigError);
@@ -22,7 +23,7 @@ class GlobalAxios {
 
   //Belows defines axios request configure callbacks
   handleRequestConfig(config) {
-    const token = localStorage.getItem('jwtToken');
+    const token = localStorage.getItem("jwtToken");
     if (token) {
       console.log(">>><<<< axios Request -> localStorage.token : ", token);
       config.headers.Authorization = token;
@@ -40,61 +41,37 @@ class GlobalAxios {
     return response;
   }
 
-  handleRespError = (error) => {
-    switch (error.response.status) {
-      case 404:
-        this.redirectTo(document, '/404')
-        break;
-
-      default:
-        this.redirectTo(document, '/404')
-        break;
-    }
-
-    return Promise.reject(error)
+  handleRespError(error) {
+    return Promise.resolve(error.response)
   }
 
-  redirectTo = (document, path) => {
-    document.location = path
-  }
-
-  //Below are api for get, post definition
-  get(path, callback) {
-    return this.glAxios
-      .get(path)
-      .then(
-        (response) => callback(response.status, response.data)
-      );
-  }
-
-  post(path, payload, callback) {
-    return this.glAxios.request({
-        method: 'POST',
-        url: path,
-        responseType: 'json',
-        data: payload
-      })
-      .then((response) => callback(response.status, response.data));
-  }
-
-  put(path, payload, callback) {
-    return this.glAxios.request({
-        method: 'PUT',
-        url: path,
-        responseType: 'json',
-        data: payload
-      })
-      .then((response) => callback(response.status, response.data));
-  }
-
-  delete(path, payload, callback) {
-    return this.glAxios.request({
-        method: 'DELETE',
-        url: path,
-        responseType: 'json',
-        data: payload
-      })
-      .then((response) => callback(response.status, response.data));
+  //-----------------------------------------------------------------------------------
+  fetch(url, params, method) {
+    return new Promise((resolve, reject) => {
+      if (method === "POST" || method === "post") {
+        this.glAxios.post(url, params)
+          .then((response) => {
+            resolve(response.data);
+          }, (error) => {
+            reject(error);
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      } else if (method === "GET" || method === "get") {
+        this.glAxios.get(url, {
+            params
+          })
+          .then((response) => {
+            resolve(response.data);
+          }, (error) => {
+            reject(error);
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      }
+    })
   }
 }
 
