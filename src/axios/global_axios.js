@@ -70,6 +70,30 @@ class GlobalAxios {
           .catch((error) => {
             reject(error)
           })
+      } else if (method === "PUT" || method === "put") {
+        this.glAxios.put(url, {
+            params
+          })
+          .then((response) => {
+            resolve(response.data);
+          }, (error) => {
+            reject(error);
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      } else if (method === "DELETE" || method === "delete") {
+        this.glAxios.delete(url, {
+            params
+          })
+          .then((response) => {
+            resolve(response.data);
+          }, (error) => {
+            reject(error);
+          })
+          .catch((error) => {
+            reject(error)
+          })
       }
     })
   }
